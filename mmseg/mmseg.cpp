@@ -1,11 +1,12 @@
 //
-//  main.cpp
+//  mmseg.cpp
 //  mmseg
 //
-//  Created by taowei on 13-11-23.
+//  Created by taowei on 13-11-27.
 //  Copyright (c) 2013年 taowei. All rights reserved.
 //
 
+#include "mmseg.h"
 #include <iostream>
 #include <map>
 #include <string>
@@ -18,87 +19,11 @@
 using namespace std;
 
 map<string, set<string> > content;
-map<string, int> freq; //frequence
-size_t chineseLength;
 
 void init() {
 	string test = "测试";
 	chineseLength = test.length()/2;
 }
-
-class Word {
-public:
-	Word() {
-
-	}
-	void setValue(string src) {
-		value = src;
-		/* 单个字符需要找到他的频率，默认值是1 */
-		if (value.length() == chineseLength) {
-			map<string, int>::iterator it = freq.find(value);
-			if (it == freq.end())
-				frequence = 1;
-			else
-				frequence = freq[value];
-		} else
-			frequence = 1;
-
-	}
-	string getValue() {
-		return value;
-	}
-	int getLength() {
-		return value.length();
-	}
-	int getFrequence() {
-		return frequence;
-	}
-private:
-	string value;
-	int frequence;
-};
-
-class Chunk {
-public:
-	vector<Word> list;
-	Chunk() {
-
-	}
-	/* 添加一个词到list里来 */
-	void addWord(Word w) {
-		list.push_back(w);
-	}
-	int getWordNumber() {
-		return list.size();
-	}
-	double getVariance() {
-		double avgLen = 0.0;
-		int listSize = list.size();
-		for (int i = 0; i < listSize; i++)
-			avgLen += list.at(i).getLength();
-		avgLen = 1.0 * avgLen / listSize;
-		double variance = 1.0;
-		for (int i = 0; i < listSize; i++) {
-			double temp = (avgLen - list.at(i).getLength());
-			variance += temp * temp;
-		}
-		return variance;
-	}
-	long getFrequence() {
-		long freqValue = 0;
-		int listSize = list.size();
-		for (int i = 0; i < listSize; i++)
-			freqValue += list.at(i).getFrequence();
-		return freqValue;
-	}
-	vector<string> getVectorString() {
-		vector<string> res;
-		int size = list.size();
-		for (int i = 0; i < size; i++)
-			res.push_back(list.at(i).getValue());
-		return res;
-	}
-};
 
 void read_terms_from_Dic() {
 	ifstream fcin("/Users/taowei/Documents/工程/mmseg/mmseg/dic.txt");
@@ -362,25 +287,3 @@ void showTermSegment(vector<string> src) {
 		cout << src.at(i) << " ";
 	cout << endl;
 }
-
-int main(int argc, const char * argv[])
-{
-	//init();
-	/* 注释掉前2个后只进行单个的分词 */
-	read_terms_from_Dic();//
-	write_index();//
-	build_index();
-	//show_Dic();
-	//string test = "《斯大林格勒保卫战》是我最喜欢的一本书";
-	//string test = "《战争与和平》是我最喜欢的一本书";
-	//string test = "LG G2是我最喜欢的一部手机";
-	//string test = "一个";
-	string test = "巴拉克-奥巴马";
-	//string test = "上海慧流云计算有限公司";
-	vector<string> seg = mmseg(test);
-	cout << endl;
-	cout << "输入样例:" << test << endl;
-	showTermSegment(seg);
-    return 0;
-}
-
